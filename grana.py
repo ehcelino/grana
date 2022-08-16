@@ -19,7 +19,10 @@ logo64 = b'iVBORw0KGgoAAAANSUhEUgAAAEEAAABECAYAAADeOlj2AAAACXBIWXMAAAsSAAALEgHS3
 meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro',
          'Outubro', 'Novembro', 'Dezembro']
 dias = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab']
-anos = ['2020', '2021', '2022', '2023', '2024', '2025']
+ano_inicio = sg.user_settings_get_entry('-anoinicial-', datetime.today().year)
+ano_agora = datetime.today().year
+anos = list(range(ano_inicio, ano_agora + 6, +1))
+
 arqdb = './db/grana.db'
 
 logging.basicConfig(filename='errorlog.txt', level=logging.DEBUG,
@@ -539,7 +542,7 @@ class funcao_principal:
                     mes = '0' + str(mes_int)
                 else:
                     mes = str(mes_int)
-                mesano = mes + '/' + self.values['-ANO-']
+                mesano = mes + '/' + str(self.values['-ANO-'])
                 self.window['-TABELA-'].update(values=movimento_ler(mesano))
                 valor_total = locale.currency(movimento_calcula_total(mesano))
                 self.window['-SALDO-'].update(value=valor_total)
@@ -771,6 +774,7 @@ class funcao_principal:
 firstrun = sg.user_settings_get_entry('-firstrun-', True)
 if firstrun:
     cria_db()
+    sg.user_settings_set_entry('-anoinicial-', datetime.today().year)
     sg.user_settings_set_entry('-firstrun-', False)
 
 obj_principal = funcao_principal()
