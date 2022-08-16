@@ -5,6 +5,7 @@ import sqlite3
 import gettext
 import re
 import logging
+import grafico as gr
 _ = gettext.gettext
 
 logo64 = b'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'
@@ -352,6 +353,7 @@ class funcao_principal:
                     # 'Save::savekey',
                     ['&Editar', ['!Configurações', 'Mudar tema'], ],
                     ['&Relatórios', ['Relatório mensal', 'Devedores']],
+                    ['Gráficos',['Mensal por categorias', 'Anual por categorias']],
                     ['&Ferramentas', ['Backup parcial', 'Backup completo', 'Administração', ['Limpar banco de dados']]],
                     ['A&juda', ['Tela principal', 'Sobre...']], ]
 
@@ -407,6 +409,33 @@ class funcao_principal:
             if self.event == '-TABELA-':
                 self.row = self.values[self.event]
                 self.dados = self.window['-TABELA-'].Values
+
+            if self.event == '-ATUALIZA-':
+                mes_int = datetime.strptime(self.values['-MES-'], '%B').month
+                if mes_int < 10:
+                    mes = '0' + str(mes_int)
+                else:
+                    mes = str(mes_int)
+                mesano = mes + '/' + str(self.values['-ANO-'])
+                self.window['-TABELA-'].update(values=movimento_ler(mesano))
+                valor_total = locale.currency(movimento_calcula_total(mesano))
+                self.window['-SALDO-'].update(value=valor_total)
+                self.window['-CATEGORIA-'].update(values=categorias_ler())
+
+            if self.event in ('-MES-', '-ANO-'):
+                self.window.write_event_value('-ATUALIZA-', '')
+
+            if self.event == 'Mensal por categorias':
+                mes_int = datetime.strptime(self.values['-MES-'], '%B').month
+                if mes_int < 10:
+                    mes = '0' + str(mes_int)
+                else:
+                    mes = str(mes_int)
+                mesano = mes + '/' + str(self.values['-ANO-'])
+                gr.grafico_cat_mensal(mesano)
+
+            if self.event == 'Anual por categorias':
+                gr.grafico_cat_anual(str(self.values['-ANO-']))
 
             if self.event == 'Mudar tema':
                 self.ev, self.vals = sg.Window('Choose Theme', [
@@ -491,18 +520,6 @@ class funcao_principal:
                         self.window['-CATEGORIA-'].update(value='')
                         self.window['-DESCRICAO-'].update(value='')
                         self.window['-VALORMOV-'].update(value='')
-
-            if self.event == '-ATUALIZA-':
-                mes_int = datetime.strptime(self.values['-MES-'], '%B').month
-                if mes_int < 10:
-                    mes = '0' + str(mes_int)
-                else:
-                    mes = str(mes_int)
-                mesano = mes + '/' + str(self.values['-ANO-'])
-                self.window['-TABELA-'].update(values=movimento_ler(mesano))
-                valor_total = locale.currency(movimento_calcula_total(mesano))
-                self.window['-SALDO-'].update(value=valor_total)
-                self.window['-CATEGORIA-'].update(values=categorias_ler())
 
             if self.event == '-ALTERA-':
                 if len(self.row) != 0:
