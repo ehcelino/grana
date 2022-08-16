@@ -265,50 +265,6 @@ def categorias_criar(categoria):
     conexao.close()
 
 
-class categorias():
-    lista = []
-
-    def janela_cat(self):
-        layout = [
-            [sg.Text('Categorias', font='_ 25')],
-            [sg.HorizontalSeparator(k='-SEP-')],
-            [sg.T('Categorias existentes: '), sg.Combo(categorias_ler(), k='-CATEGORIAS-', s=30, readonly=True),
-             sg.B('Apagar', k='-APAGA-')],
-            [sg.T('Cria nova categoria')],
-            [sg.Text('Nome da categoria:'), sg.I(size=30, k='-NOMECAT-')],
-            [sg.Push(), sg.B('Adicionar', k='-ADICIONAR-'), sg.B('Voltar', k='-VOLTAR-')]
-        ]
-        return sg.Window('Categorias', layout,
-                         finalize=True)
-
-    def __init__(self):
-        self.window = self.janela_cat()
-
-    def run(self):
-        while True:
-            # self.window['-CATEGORIAS-'].update
-            self.event, self.values = self.window.read()
-
-            if self.event == '-APAGA-':
-                categoria = self.values['-CATEGORIAS-']
-                opcao, _ = sg.Window('Continuar?', [[sg.T('Tem certeza? Os registros não serão apagados.')],
-                                                    [sg.Yes(s=10, button_text='Sim'), sg.No(s=10, button_text='Não')]],
-                                     disable_close=True, modal=True).read(close=True)
-                if opcao == 'Sim':
-                    categorias_apaga(categoria)
-                    sg.popup('Categoria excluída com sucesso.')
-                    self.window['-CATEGORIAS-'].update(values=categorias_ler())
-
-            if self.event == '-ADICIONAR-':
-                categoria = self.values['-NOMECAT-']
-                categorias_criar(categoria)
-                sg.popup('Nova categoria criada com sucesso.')
-                self.window['-CATEGORIAS-'].update(values=categorias_ler())
-                self.window['-NOMECAT-'].update(value='')
-
-            if self.event in (sg.WINDOW_CLOSED, '-VOLTAR-'):
-                break
-        self.window.close()
 
 class funcao_principal:
     titulos = ['Indice', 'Data', 'Tipo', 'Categoria', 'Descrição', 'Valor', 'R', 'Indice recorrente']
