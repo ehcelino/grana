@@ -1,6 +1,6 @@
 **Grana!** - um gerenciador de finanças pessoais simples e fácil de usar.
 
-![](C:\Users\ehcel\Documents\0 Python\Pycharm\grana\grana.png)
+![](grana.png)
 
 **Grana!** é um aplicativo bastante simplificado, mas que cumpre a função de gerenciamento financeiro pessoal. Muito simples de usar e fácil de entender, ele foi criado para suprir uma necessidade pessoal, e agora está sendo lançado publicamente.
 
