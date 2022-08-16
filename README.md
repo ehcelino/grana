@@ -1,4 +1,4 @@
-**Grana!** - um gerenciador de finanças pessoais simples e fácil de usar.
+## **Grana!** - um gerenciador de finanças pessoais simples e fácil de usar.
 
 ![](grana.png)
 
@@ -12,6 +12,7 @@ A diferença entre **Grana!** e outros gerenciadores de finanças existentes é 
 - Inclusão, alteração e exclusão de lançamentos;
 - Inclusão, alteração e exclusão de lançamentos recorrentes;
 - Total mensal de gastos;
+- Gráficos;
 - Categorias de gastos.
 
 As próximas versões receberão:
@@ -19,7 +20,6 @@ As próximas versões receberão:
 - Exclusão de lançamentos por categoria;
 - Totais baseados em categorias;
 - Geração de relatórios PDF;
-- Gráficos;
 - Entre outros.
 
 Logo atualizarei este readme com mais informações.
