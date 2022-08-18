@@ -14,11 +14,11 @@ A diferença entre **Grana!** e outros gerenciadores de finanças existentes é 
 - Total mensal de gastos;
 - Gráficos;
 - Categorias de gastos.
-
+- Totais baseados em categorias;
+- 
 As próximas versões receberão:
 
 - Exclusão de lançamentos por categoria;
-- Totais baseados em categorias;
 - Geração de relatórios PDF;
 - Entre outros.
 
