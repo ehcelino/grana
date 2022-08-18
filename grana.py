@@ -99,7 +99,7 @@ def cria_db():
         )
         conexao.commit()
     except Exception as err:
-        logger.error(err)
+        logger.error(err, exc_info=True)
         print('Não foi possível criar o banco de dados: ', err)
     conexao.close()
 
@@ -638,7 +638,7 @@ class funcao_principal:
                                 )
                                 sg.popup((_('Movimento gravado com sucesso.')))
                             except Exception as err:
-                                logger.error(err)
+                                logger.error(err, exc_info=True)
                                 sg.popup((_('Ocorreu um erro durante a gravação dos dados.')))
                             finally:
                                 pass
@@ -656,7 +656,7 @@ class funcao_principal:
                                 sg.popup((_('Movimento recorrente gravado com sucesso!')))
                             except Exception as err:
                                 sg.popup((_('Erro na gravação do movimento.')))
-                                logger.error(err)
+                                logger.error(err, exc_info=True)
                             finally:
                                 pass
                             self.window['-DIARECORRENTE-'].update(value='')
@@ -750,7 +750,7 @@ class funcao_principal:
                             self.window['-DIARECORRENTE-'].update(value='')
                             self.window['-RECORRENTE-'].update(value=False)
                         except Exception as err:
-                            logger.error(err)
+                            logger.error(err, exc_info=True)
                             sg.popup((_('Ocorreu um erro durante a gravação dos dados.')))
                         finally:
                             pass
@@ -766,7 +766,7 @@ class funcao_principal:
                             )
                             sg.popup((_('Movimento atualizado com sucesso.')))
                         except Exception as err:
-                            logger.error(err)
+                            logger.error(err, exc_info=True)
                             sg.popup((_('Ocorreu um erro durante a gravação dos dados.')))
                         finally:
                             pass
@@ -846,7 +846,7 @@ class funcao_principal:
                                     sg.popup((_('Movimento excluído com sucesso.')))
                                     self.window.write_event_value('-ATUALIZA-', '')
                                 except Exception as err:
-                                    logger.error(err)
+                                    logger.error(err, exc_info=True)
                                     sg.popup((_('Ocorreu um erro durante a exclusão do movimento.')))
                                 finally:
                                     break
@@ -857,7 +857,7 @@ class funcao_principal:
                                     sg.popup((_('Movimento excluído com sucesso.')))
                                     self.window.write_event_value('-ATUALIZA-', '')
                                 except Exception as err:
-                                    logger.error(err)
+                                    logger.error(err, exc_info=True)
                                     sg.popup((_('Ocorreu um erro durante a exclusão do movimento.')))
                                 finally:
                                     break
@@ -887,7 +887,7 @@ class funcao_principal:
                                 sg.popup((_('Movimento excluído com sucesso.')))
                                 self.window.write_event_value('-ATUALIZA-', '')
                             except Exception as err:
-                                logger.error(err)
+                                logger.error(err, exc_info=True)
                                 sg.popup((_('Ocorreu um erro durante a exclusão do movimento.')))
                             finally:
                                 pass
