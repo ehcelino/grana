@@ -18,8 +18,7 @@ logo_grande64 = b'iVBORw0KGgoAAAANSUhEUgAAATcAAAFGCAYAAAAPXNhWAAAACXBIWXMAAAsSAA
 # #############################################
 # GRANA! gerenciador de finanças pessoais
 #
-# - criar lista de anos com uma função
-# - Comparar se ja existe registro igual no banco
+# para criar requirements.txt: comando pipreqs no prompt
 # #############################################
 
 meses = [(_('Janeiro')), (_('Fevereiro')), (_('Março')), (_('Abril')), (_('Maio')), (_('Junho')),
