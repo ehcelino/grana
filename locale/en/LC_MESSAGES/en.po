@@ -1,0 +1,457 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2022-08-18 13:45-0300\n"
+"PO-Revision-Date: 2022-08-18 15:22-0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.1.1\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-SearchPath-0: grana.py\n"
+
+#: grana.py:21
+msgid "Janeiro"
+msgstr "January"
+
+#: grana.py:21
+msgid "Fevereiro"
+msgstr "February"
+
+#: grana.py:21
+msgid "Março"
+msgstr "March"
+
+#: grana.py:21
+msgid "Abril"
+msgstr "April"
+
+#: grana.py:21
+msgid "Maio"
+msgstr "May"
+
+#: grana.py:21
+msgid "Junho"
+msgstr "June"
+
+#: grana.py:22
+msgid "Julho"
+msgstr "July"
+
+#: grana.py:22
+msgid "Agosto"
+msgstr "August"
+
+#: grana.py:22
+msgid "Setembro"
+msgstr "September"
+
+#: grana.py:23
+msgid "Outubro"
+msgstr "October"
+
+#: grana.py:23
+msgid "Novembro"
+msgstr "November"
+
+#: grana.py:23
+msgid "Dezembro"
+msgstr "December"
+
+#: grana.py:24
+msgid "Dom"
+msgstr "Sun"
+
+#: grana.py:24
+msgid "Seg"
+msgstr "Mon"
+
+#: grana.py:24
+msgid "Ter"
+msgstr "Tue"
+
+#: grana.py:24
+msgid "Qua"
+msgstr "Wed"
+
+#: grana.py:24
+msgid "Qui"
+msgstr "Thu"
+
+#: grana.py:24
+msgid "Sex"
+msgstr "Fri"
+
+#: grana.py:24
+msgid "Sab"
+msgstr "Sat"
+
+#: grana.py:308
+msgid "Indice"
+msgstr "Index"
+
+#: grana.py:308 grana.py:361 grana.py:387 grana.py:417
+msgid "Data"
+msgstr "Date"
+
+#: grana.py:308
+msgid "Tipo"
+msgstr "Kind"
+
+#: grana.py:308
+msgid "Categoria"
+msgstr "Category"
+
+#: grana.py:309 grana.py:361 grana.py:387
+msgid "Descrição"
+msgstr "Description"
+
+#: grana.py:309 grana.py:361 grana.py:387
+msgid "Valor"
+msgstr "Value"
+
+#: grana.py:309
+msgid "R"
+msgstr "R"
+
+#: grana.py:309
+msgid "Indice recorrente"
+msgstr "Recurrent index"
+
+#: grana.py:322
+msgid "Você está prestes a apagar um lançamento recorrente."
+msgstr "You are about to delete a recurring entry."
+
+#: grana.py:324
+msgid "Você deseja apagá-lo daqui por diante ou retroativamente?"
+msgstr "Do you want to delete it going forward or retroactively?"
+
+#: grana.py:325
+msgid "Daqui por diante"
+msgstr "Going forward"
+
+#: grana.py:325
+msgid "Retroativamente"
+msgstr "Retroactively"
+
+#: grana.py:326 grana.py:432 grana.py:579
+msgid "Cancelar"
+msgstr "Cancel"
+
+#: grana.py:328 grana.py:351
+msgid "Apagar"
+msgstr "Delete"
+
+#: grana.py:333
+msgid "Sobre"
+msgstr "About"
+
+#: grana.py:335
+msgid "A fazer..."
+msgstr "In construction..."
+
+#: grana.py:336
+msgid "Quer personalizar sua cópia do programa? Digite seu nome abaixo:"
+msgstr "Want to customize your copy of the program? Enter your name below:"
+
+#: grana.py:338
+msgid "Gravar"
+msgstr "Record"
+
+#: grana.py:341 grana.py:354 grana.py:381 grana.py:406
+msgid "Voltar"
+msgstr "Go back"
+
+#: grana.py:343
+msgid "Sobre..."
+msgstr "About..."
+
+#: grana.py:348 grana.py:356 grana.py:431
+msgid "Categorias"
+msgstr "Categories"
+
+#: grana.py:350
+msgid "Categorias existentes: "
+msgstr "Existing categories:"
+
+#: grana.py:352
+msgid "Cria nova categoria"
+msgstr "Create new category"
+
+#: grana.py:353
+msgid "Nome da categoria:"
+msgstr "Category name:"
+
+#: grana.py:354 grana.py:429
+msgid "Adicionar"
+msgstr "Add"
+
+#: grana.py:364 grana.py:383
+msgid "Gasto anual por categoria"
+msgstr "Anual expenditure by category"
+
+#: grana.py:366
+msgid "Categoria: "
+msgstr "Category:"
+
+#: grana.py:367 grana.py:458
+msgid "Ano:"
+msgstr "Year:"
+
+#: grana.py:380 grana.py:405
+msgid "Total:"
+msgstr "Total:"
+
+#: grana.py:381 grana.py:406
+msgid "Preencher tabela"
+msgstr "Fill table"
+
+#: grana.py:390
+msgid "Valor recebido por ano"
+msgstr "Anual income"
+
+#: grana.py:408
+msgid "Valor recebido anual"
+msgstr "Anual income"
+
+#: grana.py:415 grana.py:609 grana.py:865
+msgid "Data:"
+msgstr "Date:"
+
+#: grana.py:419 grana.py:610 grana.py:867
+msgid "Tipo:"
+msgstr "Kind:"
+
+#: grana.py:421
+msgid "Entrada"
+msgstr "In"
+
+#: grana.py:422
+msgid "Saída"
+msgstr "Out"
+
+#: grana.py:423 grana.py:611 grana.py:869
+msgid "Categoria:"
+msgstr "Category:"
+
+#: grana.py:424 grana.py:612 grana.py:870
+msgid "Descrição:"
+msgstr "Description:"
+
+#: grana.py:424
+msgid "Valor: R$"
+msgstr "Value:"
+
+#: grana.py:430
+msgid "Atualizar"
+msgstr "Update"
+
+#: grana.py:435
+msgid "É recorrente?"
+msgstr "Is it recurring?"
+
+#: grana.py:436
+msgid "Dia do mês:"
+msgstr "Day of the month:"
+
+#: grana.py:437
+msgid "A partir de:"
+msgstr "Since:"
+
+#: grana.py:454 grana.py:496
+msgid "Grana! finanças pessoais"
+msgstr "Grana! personal finance"
+
+#: grana.py:456
+msgid "Mês:"
+msgstr "Month:"
+
+#: grana.py:472
+msgid "Alterar registro"
+msgstr "Modify entry"
+
+#: grana.py:472
+msgid "Apagar registro"
+msgstr "Erase entry"
+
+#: grana.py:473
+msgid "Gerar relatório em PDF"
+msgstr "Create PDF report"
+
+#: grana.py:474
+msgid "Saldo:"
+msgstr "Balance:"
+
+#: grana.py:477
+msgid "Movimento"
+msgstr "Movement"
+
+#: grana.py:480 grana.py:886
+msgid "Sair"
+msgstr "Exit"
+
+#: grana.py:521
+msgid "Recebido anual"
+msgstr "Anual income"
+
+#: grana.py:542
+msgid "Categorias anual"
+msgstr "Anual by category"
+
+#: grana.py:558
+msgid "Selecione uma categoria."
+msgstr "Select a category."
+
+#: grana.py:563
+msgid "Mensal por categorias"
+msgstr "Monthly by category"
+
+#: grana.py:572
+msgid "Anual por categorias"
+msgstr "Anual by category"
+
+#: grana.py:575
+msgid "Mudar tema"
+msgstr "Change theme"
+
+#: grana.py:576
+msgid "Escolha o tema"
+msgstr "Choose theme"
+
+#: grana.py:579 grana.py:581
+msgid "Aceitar"
+msgstr "Accept"
+
+#: grana.py:595 grana.py:710
+msgid "Campo data inválido."
+msgstr "Date field invalid."
+
+#: grana.py:597 grana.py:712
+msgid "Você deve escolher uma categoria."
+msgstr "You must choose a category."
+
+#: grana.py:599 grana.py:714
+msgid "Campo descrição não pode estar vazio."
+msgstr "Description field can't be empty."
+
+#: grana.py:601 grana.py:716
+msgid "Campo valor inválido."
+msgstr "Value field is invalid."
+
+#: grana.py:603
+msgid "Se o movimento é recorrente, preencha o campo Dia do mês."
+msgstr "If the movement is recurring, fill in the day of the month field."
+
+#: grana.py:605
+msgid "A data de início do movimento recorrente está errada."
+msgstr "Recurring movement start date is wrong."
+
+#: grana.py:607 grana.py:863
+msgid "Confirma"
+msgstr "Accept"
+
+#: grana.py:608
+msgid "Deseja gravar este movimento:"
+msgstr "Do you want to record this movement:"
+
+#: grana.py:613 grana.py:871
+msgid "Valor:"
+msgstr "Value:"
+
+#: grana.py:614 grana.py:781 grana.py:784 grana.py:873 grana.py:875
+msgid "Sim"
+msgstr "Yes"
+
+#: grana.py:614 grana.py:616 grana.py:782 grana.py:873
+msgid "Não"
+msgstr "No"
+
+#: grana.py:630
+msgid "Movimento gravado com sucesso."
+msgstr "Movement recorded successfuly."
+
+#: grana.py:633 grana.py:745 grana.py:761
+msgid "Ocorreu um erro durante a gravação dos dados."
+msgstr "An error ocurred while writing data."
+
+#: grana.py:647
+msgid "Movimento recorrente gravado com sucesso!"
+msgstr "Recurring movement saved successfully!"
+
+#: grana.py:649
+msgid "Erro na gravação do movimento."
+msgstr "Error while saving movement."
+
+#: grana.py:687
+msgid "Selecione um registro da tabela."
+msgstr "Select a record from the table."
+
+#: grana.py:718
+msgid "Dia de recorrência não pode ser vazio."
+msgstr "Recurrence day cannot be empty."
+
+#: grana.py:720
+msgid "Data de início da recorrência inválida."
+msgstr "Invalid recurrence start date."
+
+#: grana.py:722
+msgid ""
+"Atenção: este registro é recorrente. Não é possível converter entre tipos de "
+"registro."
+msgstr ""
+"Attention: this is a recurring entry. Cannot convert between entry types."
+
+#: grana.py:725
+msgid ""
+"Atenção: este registro não é recorrente. Não é possível converter entre "
+"tipos de registro."
+msgstr ""
+"Attention: this is not a recurring entry. Cannot convert between entry types."
+
+#: grana.py:740 grana.py:758
+msgid "Movimento atualizado com sucesso."
+msgstr "Movement updated successfuly."
+
+#: grana.py:780
+msgid "Continuar?"
+msgstr "Continue?"
+
+#: grana.py:780
+msgid "Tem certeza? Os registros não serão apagados."
+msgstr "Are you sure? No records will be erased."
+
+#: grana.py:786
+msgid "Categoria excluída com sucesso."
+msgstr "Category successfuly deleted."
+
+#: grana.py:792
+msgid "Nova categoria criada com sucesso."
+msgstr "Successfuly created new category."
+
+#: grana.py:810
+msgid "Usuário gravado com sucesso!"
+msgstr "User saved successfuly!"
+
+#: grana.py:813
+msgid "Campo não pode ser vazio, e deve ser diferente do valor anterior."
+msgstr "Field cannot be empty, and must be different from previous entry."
+
+#: grana.py:837 grana.py:848 grana.py:878
+msgid "Movimento excluído com sucesso."
+msgstr "Movement deleted successfuly."
+
+#: grana.py:841 grana.py:852 grana.py:882
+msgid "Ocorreu um erro durante a exclusão do movimento."
+msgstr "An error ocurred during movement exclusion."
+
+#: grana.py:856
+msgid "Operação cancelada."
+msgstr "Operation canceled."
+
+#: grana.py:864
+msgid "Tem certeza que deseja apagar este lançamento?"
+msgstr "You are about to delete this movement. Are you sure?"
