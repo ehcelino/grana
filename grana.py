@@ -7,6 +7,7 @@ import re
 import logging
 import grafico as gr
 from dateutil.relativedelta import relativedelta
+import operator
 _ = gettext.gettext
 
 # en = gettext.translation('en', localedir='locale', languages=['en'])
@@ -167,11 +168,12 @@ def movimento_grava(data, tipo, categoria, descricao, valor, relrec):
     conexao.close()
 
 def movimento_grava_recorrente(dia, tipo, categoria, descricao, valor, datainicio):
-    dados = [dia, tipo, categoria, descricao, valor, datainicio]
+    dataultimaatualizacao = str(dia) + datetime.strftime(datetime.now(), '/%m/%Y')
+    dados = [dia, tipo, categoria, descricao, valor, datainicio, dataultimaatualizacao]
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
     comando = 'INSERT INTO recorrente(re_dia, re_tipo, re_categoria, ' \
-              're_descricao, re_valor, re_data_inicio) VALUES (?, ?, ?, ?, ?, ?)'
+              're_descricao, re_valor, re_data_inicio, re_ultima_atualizacao) VALUES (?, ?, ?, ?, ?, ?, ?)'
     c.execute(comando, dados)
     conexao.commit()
     indice_recorrente = c.lastrowid
@@ -188,9 +190,31 @@ def movimento_grava_recorrente(dia, tipo, categoria, descricao, valor, datainici
     conexao.close()
 
 def movimento_integra():
+    ultima_ativacao = sg.user_settings_get_entry('-ultimaativacao-')
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
-    comando = 'SELECT re_index'
+    comando = ('SELECT * FROM recorrente')
+    c.execute(comando)
+    resultado = c.fetchall()
+    data = None
+    for idx, x in enumerate(resultado):
+        data = datetime.strptime(x[7], '%d/%m/%Y')
+        diferenca = datetime.now().month - data.month
+        if diferenca > 0:
+            y = 0
+            while y < diferenca:
+                data_tmp = datetime.now() + relativedelta(day=int(x[1]))
+                data_final = data_tmp - relativedelta(months=y)
+                print(datetime.strftime(data_final, '%d/%m/%Y'))
+                data_final_str = datetime.strftime(data_final, '%d/%m/%Y')
+                movimento_grava(data_final_str, x[2], x[3], x[4], x[5], x[0])
+                y = y + 1
+            # ATUALizA DATA RECORRENTE
+            dados = (data_final_str, x[0])
+            c.execute('UPDATE recorrente SET re_ultima_atualizacao = ? WHERE re_index = ?', dados)
+            conexao.commit()
+    conexao.close()
+    print(resultado)
 
 def movimento_atualiza(indice, data, tipo, categoria, descricao, valor):
     dados = [data, tipo, categoria, descricao, valor, indice]
@@ -301,6 +325,20 @@ def categorias_criar(categoria):
     c.execute('INSERT INTO categoria(ca_categoria) VALUES (?)', (categoria,))
     conexao.commit()
     conexao.close()
+
+def sort_table(table, cols):
+    """ sort a table by multiple columns
+        table: a list of lists (or tuple of tuples) where each inner list
+               represents a row
+        cols:  a list (or tuple) specifying the column numbers to sort by
+               e.g. (1,0) would sort by column 1, then by column 0
+    """
+    for col in reversed(cols):
+        try:
+            table = sorted(table, key=operator.itemgetter(col))
+        except Exception as e:
+            sg.popup_error('Error in sort_table', 'Exception in sort_table', e)
+    return table
 
 class splashscreen():
     tmp = sg.user_settings_get_entry('-splashscreen-', True)
@@ -454,7 +492,7 @@ class funcao_principal:
                     ['&Relatórios', ['Categorias anual', 'Recebido anual']],
                     ['Gráficos',['Mensal por categorias', 'Anual por categorias']],
                     ['&Ferramentas', ['Backup parcial', 'Backup completo', 'Administração', ['Limpar banco de dados']]],
-                    ['A&juda', ['Tela principal', 'Sobre...']], ]
+                    ['A&juda', ['Tela principal', 'Sobre...', 'Erro']], ]
 
         self.layout = [[sg.Menu(menu_def)],
                        [sg.Image(data=logo64),
@@ -507,6 +545,16 @@ class funcao_principal:
         while True:
             self.event, self.values = self.window.read()
 
+            # teste do logger de erros
+            if self.event == 'Erro':
+                try:
+                    minha_funcao()
+                except Exception as err:
+                    logger.error(err, exc_info=True)
+                    sg.popup_error('Error', err)
+                finally:
+                    pass
+
             if self.event == '-TABELA-':
                 self.row = self.values[self.event]
                 self.dados = self.window['-TABELA-'].Values
@@ -518,7 +566,8 @@ class funcao_principal:
                 else:
                     mes = str(mes_int)
                 mesano = mes + '/' + str(self.values['-ANO-'])
-                self.window['-TABELA-'].update(values=movimento_ler(mesano))
+                tabelasort = sort_table(movimento_ler(mesano), (1, 0))
+                self.window['-TABELA-'].update(values=tabelasort)
                 valor_total = locale.currency(movimento_calcula_total(mesano))
                 self.window['-SALDO-'].update(value=valor_total)
                 self.window['-CATEGORIA-'].update(values=categorias_ler())
@@ -812,13 +861,12 @@ class funcao_principal:
                     self.ev, self.val = self.win.read()
 
                     if self.ev == '-GRAVA-':
-                        if self.val['-NOME-'] != '' and \
-                                self.val['-NOME-'] != sg.user_settings_get_entry('-usuario-', ''):
+                        if self.val['-NOME-'] != sg.user_settings_get_entry('-usuario-', ''):
                             sg.user_settings_set_entry('-usuario-', self.val['-NOME-'])
                             sg.popup((_('Usuário gravado com sucesso!')))
                             self.window['-TITULO-'].update(value='Grana! finanças pessoais de ' + self.val['-NOME-'])
                         else:
-                            sg.popup((_('Campo não pode ser vazio, e deve ser diferente do valor anterior.')))
+                            sg.popup((_('Campo deve ser diferente do valor anterior.')))
                     if self.ev == '-SPLASH-':
                         if self.val['-SPLASH-']:
                             sg.user_settings_set_entry('-splashscreen-', True)
@@ -902,7 +950,7 @@ if firstrun:
     sg.user_settings_set_entry('-anoinicial-', datetime.today().year)
     sg.user_settings_set_entry('-firstrun-', False)
 
-
+movimento_integra()
 splashscreen()
 obj_principal = funcao_principal()
 obj_principal.run()
