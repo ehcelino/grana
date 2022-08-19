@@ -1,5 +1,7 @@
 import sqlite3
 from matplotlib import pyplot as plt
+import PySimpleGUI as sg
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 arqdb = './db/grana.db'
 
@@ -45,6 +47,12 @@ def mov_lista_cat_anual(ano):
     print(final)
     return final
 
+def draw_figure(canvas, figure):
+    figure_canvas_agg = FigureCanvasTkAgg(figure, canvas)
+    figure_canvas_agg.draw()
+    figure_canvas_agg.get_tk_widget().pack(side='top', fill='both', expand=1)
+    return figure_canvas_agg
+
 def grafico_cat_mensal(mesano):
     lista_tmp = mov_lista_cat_mensal(mesano)
     etiquetas = []
@@ -52,10 +60,27 @@ def grafico_cat_mensal(mesano):
     for idx, x in enumerate(lista_tmp):
         etiquetas.append(x[0])
         pedacos.append(x[1])
-    plt.pie(pedacos, labels=etiquetas, shadow=True, wedgeprops={'edgecolor': 'black'}, autopct=f"%0.2f%%")  # , colors=colors
-    plt.title("Gastos mensais por categoria")
-    plt.tight_layout()
-    plt.show()
+    # plt.pie(pedacos, labels=etiquetas, shadow=True, wedgeprops={'edgecolor': 'black'}, autopct=f"%0.2f%%")  # , colors=colors
+    # plt.title("Gastos mensais por categoria")
+    # plt.tight_layout()
+    # plt.show()
+    fig, ax = plt.subplots()
+    ax.pie(pedacos, labels=etiquetas, shadow=True, wedgeprops={'edgecolor': 'black'}, autopct=f"%0.2f%%")
+    ax.axis('equal')
+
+    layout = [[sg.Text('Gastos mensais por categoria', font='Helvetica 18')],
+              [sg.Canvas(key='-CANVAS-')],
+              [sg.Push(), sg.Button('Voltar')]]
+
+    window = sg.Window('Gastos mensais por categoria', layout, location=(10, 10), finalize=True,
+                       element_justification='center')  # , font='Helvetica 18'
+
+    # add the plot to the window
+    fig_canvas_agg = draw_figure(window['-CANVAS-'].TKCanvas, fig)
+
+    event, values = window.read()
+
+    window.close()
 
 def grafico_cat_anual(ano):
     lista_tmp = mov_lista_cat_anual(ano)

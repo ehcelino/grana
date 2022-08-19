@@ -144,7 +144,11 @@ def movimento_ler(mesano):
             tmp_rec = 'R'
         else:
             tmp_rec = ''
-        temp = [x[0], x[1], x[2], x[3], x[4], locale.currency(x[5]), tmp_rec, x[6]]
+        if x[2] == 'Saída':
+            tmp_val = - x[5]
+        else:
+            tmp_val = x[5]
+        temp = [x[0], x[1], x[2], x[3], x[4], locale.currency(tmp_val), tmp_rec, x[6]]
         resultado_final.append(temp)
     return resultado_final
 
@@ -183,14 +187,14 @@ def movimento_grava_recorrente(dia, tipo, categoria, descricao, valor, datainici
     x = 0
     while x < dif_meses + 1:
         data_final = data_tmp - relativedelta(months=x)
-        print(datetime.strftime(data_final, '%d/%m/%Y'))
+        # print(datetime.strftime(data_final, '%d/%m/%Y'))
         data_final_str = datetime.strftime(data_final, '%d/%m/%Y')
         movimento_grava(data_final_str, tipo, categoria, descricao, valor, indice_recorrente)
         x = x + 1
     conexao.close()
 
 def movimento_integra():
-    ultima_ativacao = sg.user_settings_get_entry('-ultimaativacao-')
+    # ultima_ativacao = sg.user_settings_get_entry('-ultimaativacao-')
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
     comando = ('SELECT * FROM recorrente')
@@ -205,16 +209,17 @@ def movimento_integra():
             while y < diferenca:
                 data_tmp = datetime.now() + relativedelta(day=int(x[1]))
                 data_final = data_tmp - relativedelta(months=y)
-                print(datetime.strftime(data_final, '%d/%m/%Y'))
+                # print(datetime.strftime(data_final, '%d/%m/%Y'))
                 data_final_str = datetime.strftime(data_final, '%d/%m/%Y')
                 movimento_grava(data_final_str, x[2], x[3], x[4], x[5], x[0])
                 y = y + 1
             # ATUALizA DATA RECORRENTE
-            dados = (data_final_str, x[0])
+            data_tmp_str = datetime.strftime(data_tmp, '%d/%m/%Y')
+            dados = (data_tmp_str, x[0])
             c.execute('UPDATE recorrente SET re_ultima_atualizacao = ? WHERE re_index = ?', dados)
             conexao.commit()
     conexao.close()
-    print(resultado)
+    # print(resultado)
 
 def movimento_atualiza(indice, data, tipo, categoria, descricao, valor):
     dados = [data, tipo, categoria, descricao, valor, indice]
@@ -302,8 +307,6 @@ def categorias_ler():
     resultado_list = []
     for idx, x in enumerate(resultado):
         resultado_list.append(''.join(x))
-    print(resultado)
-    print(resultado_list)
     conexao.close()
     return resultado_list
 
@@ -336,8 +339,9 @@ def sort_table(table, cols):
     for col in reversed(cols):
         try:
             table = sorted(table, key=operator.itemgetter(col))
-        except Exception as e:
-            sg.popup_error('Error in sort_table', 'Exception in sort_table', e)
+        except Exception as err:
+            logger.error(err, exc_info=True)
+            sg.popup_error('Erro', 'Erro na função de organizar tabela', err)
     return table
 
 class splashscreen():
@@ -418,6 +422,7 @@ class funcao_principal:
                          auto_size_columns=False,  # justification='Left',
                          k='-TABELA-',
                          enable_events=True,
+                         enable_click_events=True,
                          expand_x=True,
                          expand_y=True,
                          num_rows=16)],
@@ -467,13 +472,14 @@ class funcao_principal:
               sg.Radio((_('Saída')), group_id='-ENSAI-', k='-SAIDA-'),
               sg.T((_('Categoria:'))), sg.Combo(categorias_ler(), size=25, k='-CATEGORIA-', readonly=True)],
              [sg.T((_('Descrição:'))), sg.I(size=50, k='-DESCRICAO-'), sg.Push(), sg.T((_('Valor: R$'))),
-              sg.I(size=15, k='-VALORMOV-')]
+              sg.I(size=15, k='-VALORMOV-')],
+             [sg.B((_('Categorias')), k='-CATEGORIAS-')],
              # disabled=True,
              ])
         coluna3_def = sg.Column([
             [sg.B((_('Adicionar')), k='-ADICIONAR-', bind_return_key=True)],
             [sg.B((_('Atualizar')), k='-ATUALIZAR-', disabled=True)],
-            [sg.B((_('Categorias')), k='-CATEGORIAS-')],
+
             [sg.B((_('Cancelar')), k='-CANCELAR-', disabled=True)]
         ])
         coluna2_def = sg.Column([
@@ -511,11 +517,12 @@ class funcao_principal:
                                  auto_size_columns=False,  # justification='Left',
                                  k='-TABELA-',
                                  enable_events=True,
+                                 enable_click_events=True,
                                  expand_x=True,
                                  expand_y=True,
                                  num_rows=16)],
                        [sg.B((_('Alterar registro')), k='-ALTERA-'), sg.B((_('Apagar registro')), k='-APAGA-'),
-                        sg.B((_('Gerar relatório em PDF')), k='-RELPDF-'),
+                        sg.B((_('Gráfico do mês')), k='Mensal por categorias'),
                         sg.Push(), sg.T((_('Saldo:'))),
                         sg.I(
                              size=10, k='-SALDO-')],
@@ -604,7 +611,7 @@ class funcao_principal:
                         tabela = []
                         valortotal = 0.0
                         if self.val['-CATEGORIAS-'] != '':
-                            print('categoria: ', self.val['-CATEGORIAS-'])
+                            # print('categoria: ', self.val['-CATEGORIAS-'])
                             tabela_tmp = mov_anual_categoria(self.val['-CATEGORIAS-'], self.val['-ANO-'])
                             for idx, x in enumerate(tabela_tmp):
                                 tabela.append([x[0], x[1], locale.currency(x[2])])
@@ -716,12 +723,31 @@ class funcao_principal:
                         self.window['-DESCRICAO-'].update(value='')
                         self.window['-VALORMOV-'].update(value='')
 
+            # SORT TABLE
+            if isinstance(self.event, tuple):
+                # TABLE CLICKED Event has value in format ('-TABLE=', '+CLICKED+', (row,col))
+                if self.event[0] == '-TABELA-':
+                    mes_int = datetime.strptime(self.values['-MES-'], '%B').month
+                    if mes_int < 10:
+                        mes = '0' + str(mes_int)
+                    else:
+                        mes = str(mes_int)
+                    mesano = mes + '/' + str(self.values['-ANO-'])
+                    movimento = movimento_ler(mesano)
+                    if self.event[2][0] == -1 and self.event[2][1] != -1:  # Header was clicked and wasn't the "row" column
+                        col_num_clicked = self.event[2][1] + 1
+                        # print('n. da coluna: ', col_num_clicked)
+                        new_table = sort_table(movimento, (col_num_clicked, 0))
+                        self.window['-TABELA-'].update(new_table)
+                        # data = [data[0]] + new_table
+            # SORT TABLE
+
             if self.event == '-ALTERA-':
                 if len(self.row) != 0:
                     self.window['-CANCELAR-'].update(disabled=False)
                     self.indice_tmp = self.dados[self.row[0]][0]
                     dados_tmp = movimento_ler_indice(self.indice_tmp)
-                    print(dados_tmp)
+                    # print(dados_tmp)
                     self.window['-DATAMOV-'].update(value=dados_tmp[0])
                     if dados_tmp[1] == 'Entrada':
                         self.window['-ENTRADA-'].update(value=True)
@@ -734,8 +760,8 @@ class funcao_principal:
                         self.indice_recorrente = dados_tmp[5]
                         self.window['-RECORRENTE-'].update(value=True)
                         dados_recorrente = movimento_ler_recorrente(dados_tmp[5])
-                        print(dados_tmp[5])
-                        print(dados_recorrente)
+                        # print(dados_tmp[5])
+                        # print(dados_recorrente)
                         self.window['-DIARECORRENTE-'].update(value=dados_recorrente[0])
                         self.window['-DATARECORRENTE-'].update(value=dados_recorrente[1])
                     self.window['-ATUALIZAR-'].update(disabled=False)
@@ -879,15 +905,15 @@ class funcao_principal:
             if self.event == '-APAGA-':
                 if len(self.row) != 0:
                     if self.dados[self.row[0]][6] != '':
-                        print('é recorrente!')
+                        # print('é recorrente!')
                         self.linha_tmp = movimento_ler_recorrente(self.dados[self.row[0]][7])
-                        print(self.dados[self.row[0]][7])
-                        print(self.linha_tmp)
+                        # print(self.dados[self.row[0]][7])
+                        # print(self.linha_tmp)
                         self.win = self.janela_recorrente()
                         while True:
                             self.ev, self.val = self.win.read()
                             if self.ev == '-DAQUI-':
-                                print('daqui por diante')
+                                # print('daqui por diante')
                                 try:
                                     movimento_apaga_recorrente(self.dados[self.row[0]][7])
                                     sg.popup((_('Movimento excluído com sucesso.')))
@@ -898,7 +924,7 @@ class funcao_principal:
                                 finally:
                                     break
                             elif self.ev == '-RETRO-':
-                                print('retroativamente')
+                                # print('retroativamente')
                                 try:
                                     movimento_apaga_recorrente_retro(self.dados[self.row[0]][7])
                                     sg.popup((_('Movimento excluído com sucesso.')))
@@ -913,9 +939,9 @@ class funcao_principal:
                                 break
                         self.win.close()
                     else:
-                        print('self dados self row 0 ', self.dados[self.row[0]])
-                        print('self row ', self.row)
-                        print('self dados', self.dados)
+                        # print('self dados self row 0 ', self.dados[self.row[0]])
+                        # print('self row ', self.row)
+                        # print('self dados', self.dados)
                         self.ev, self.vals = sg.Window((_('Confirma')), [
                             [sg.Text((_('Tem certeza que deseja apagar este lançamento?')))],
                             [sg.Text((_('Data:')), size=self.tam_texto),
@@ -950,7 +976,13 @@ if firstrun:
     sg.user_settings_set_entry('-anoinicial-', datetime.today().year)
     sg.user_settings_set_entry('-firstrun-', False)
 
-movimento_integra()
+try:
+    movimento_integra()
+except Exception as err:
+    logger.error(err, exc_info=True)
+    print('Erro na função de integração de recorrentes ', err)
+finally:
+    pass
 splashscreen()
 obj_principal = funcao_principal()
 obj_principal.run()
