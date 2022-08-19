@@ -73,13 +73,9 @@ def grafico_cat_mensal(mesano):
               [sg.Push(), sg.Button('Voltar')]]
 
     window = sg.Window('Gastos mensais por categoria', layout, location=(10, 10), finalize=True,
-                       element_justification='center')  # , font='Helvetica 18'
-
-    # add the plot to the window
+                       element_justification='center')
     fig_canvas_agg = draw_figure(window['-CANVAS-'].TKCanvas, fig)
-
     event, values = window.read()
-
     window.close()
 
 def grafico_cat_anual(ano):
@@ -89,7 +85,21 @@ def grafico_cat_anual(ano):
     for idx, x in enumerate(lista_tmp):
         etiquetas.append(x[0])
         pedacos.append(x[1])
-    plt.pie(pedacos, labels=etiquetas, shadow=True, wedgeprops={'edgecolor': 'black'}, autopct=f"%0.2f%%")  # , colors=colors
-    plt.title("Gastos de {} por categoria".format(ano))
-    plt.tight_layout()
-    plt.show()
+    # plt.pie(pedacos, labels=etiquetas, shadow=True, wedgeprops={'edgecolor': 'black'}, autopct=f"%0.2f%%")  # , colors=colors
+    # plt.title("Gastos de {} por categoria".format(ano))
+    # plt.tight_layout()
+    # plt.show()
+    fig, ax = plt.subplots()
+    ax.pie(pedacos, labels=etiquetas, shadow=True, wedgeprops={'edgecolor': 'black'}, autopct=f"%0.2f%%")
+    ax.axis('equal')
+
+    layout = [[sg.Text("Gastos de {} por categoria".format(ano), font='Helvetica 18')],
+              [sg.Canvas(key='-CANVAS-')],
+              [sg.Push(), sg.Button('Voltar')]]
+
+    window = sg.Window('Gastos anuais por categoria', layout, location=(10, 10), finalize=True,
+                       element_justification='center')
+
+    fig_canvas_agg = draw_figure(window['-CANVAS-'].TKCanvas, fig)
+    event, values = window.read()
+    window.close()
