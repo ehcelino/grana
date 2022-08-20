@@ -10,6 +10,7 @@ from dateutil.relativedelta import relativedelta
 import operator
 import img
 import os
+import shutil
 _ = gettext.gettext
 
 
@@ -399,6 +400,73 @@ def sort_table(table, cols):
             sg.popup_error('Erro', 'Erro na função de organizar tabela', err)
     return table
 
+class Backup:
+    pastabkp = ''
+    endereco = os.getcwd()
+    nomearq = ''
+    nomedapasta = os.path.basename(endereco)
+    enderecopai = os.path.dirname(endereco)
+
+    def __init__(self):
+        self.values = None
+        self.event = None
+        self.layout = [
+            [sg.Text('Cópia de segurança', font='_ 25')],
+            [sg.HorizontalSeparator(k='-SEP-')],
+            [sg.T('Esta função gera um arquivo compactado.')],
+            [sg.T('De preferência, use como destino um drive removível (pendrive).')],
+            [sg.Text('Selecione a pasta onde deseja guardar uma cópia do sistema:')],
+            [sg.Combo(sorted(sg.user_settings_get_entry('-pastasbkp-', [])),
+                      default_value=sg.user_settings_get_entry('-ultimapastabkp-', ''), size=(50, 1),
+                      key='-NOMEDAPASTA-'), sg.FolderBrowse('Abrir pasta...')],
+            [sg.pin(sg.T('Por favor aguarde... Não feche esta janela.', k='-AGUARDE-', visible=False))],
+            [sg.Push(), sg.Button('Gerar cópia', k='-BACKUP-'), sg.Button('Sair', k='-SAIR-')]
+        ]
+
+        self.window = sg.Window('Cópia de segurança', self.layout, )
+
+    def run(self):
+        while True:
+            self.event, self.values = self.window.read()
+            print(self.event, self.values)
+            if self.event in (sg.WIN_CLOSED, '-SAIR-'):
+                break
+            if self.event == '-BACKUP-':
+                sg.user_settings_set_entry('-pastasbkp-', list(
+                    set(sg.user_settings_get_entry('-pastasbkp-', []) + [self.values['-NOMEDAPASTA-'], ])))
+                sg.user_settings_set_entry('-ultimapastabkp-', self.values['-NOMEDAPASTA-'])
+                data = datetime.now()
+                data = data.strftime("%d-%m-%Y")
+                # self.pastabkp = self.values['-NOMEDAPASTA-'].rstrip() + '/' + 'sistema' + data
+                self.pastabkp = self.values['-NOMEDAPASTA-'].rstrip() + '/'
+                self.nomearq = 'grana-' + data
+                arquivo = self.pastabkp + self.nomearq
+                def fazbkp():
+                    try:
+                        shutil.make_archive(base_name=arquivo, root_dir=self.enderecopai,
+                                            base_dir=self.nomedapasta, format='zip')
+                    except Exception as err:
+                        logger.error(err, exc_info=True)
+                    finally:
+                        pass
+                    return 0
+
+                self.window['-SAIR-'].update(disabled=True)
+                try:
+                    self.window['-AGUARDE-'].update(visible=True)
+                    self.window.perform_long_operation(fazbkp, '-OPERATION DONE-')
+                except Exception as err:
+                    logger.error(err, exc_info=True)
+                    sg.popup('Erro na criação do arquivo compactado: ', err)
+                    self.window['-SAIR-'].update(disabled=False)
+                    self.window['-AGUARDE-'].update(visible=False)
+            if self.event == '-OPERATION DONE-':
+                self.window['-AGUARDE-'].update(visible=False)
+                self.window['-SAIR-'].update(disabled=False)
+                sg.popup('Arquivo compactado gerado com sucesso.')
+
+        self.window.close()
+
 class splashscreen():
     tmp = sg.user_settings_get_entry('-splashscreen-', True)
     if tmp == True:
@@ -578,7 +646,8 @@ class funcao_principal:
 ################################ Janela principal do programa
     def cria_janela(self):
         global _
-        # sg.theme(sg.user_settings_get_entry('-tema-', None))
+        sz = (12, 1)
+        sg.theme(sg.user_settings_get_entry('-tema-', None))
         coluna1_def = sg.Column(
             [[sg.T(_('Data:')), sg.I(default_text=datetime.strftime(datetime.now(), '%d/%m/%Y'), k='-DATAMOV-',
                                   size=10),
@@ -591,14 +660,14 @@ class funcao_principal:
               sg.T((_('Categoria:'))), sg.Combo(categorias_ler(), size=25, k='-CATEGORIA-', readonly=True)],
              [sg.T((_('Descrição:'))), sg.I(size=50, k='-DESCRICAO-'), sg.Push(), sg.T((_('Valor: R$'))),
               sg.I(size=15, k='-VALORMOV-')],
-             [sg.B((_('Categorias')), k='-CATEGORIAS-')],
+             [sg.B((_('Categorias')), s=sz, k='-CATEGORIAS-')],
              # disabled=True,
              ])
         coluna3_def = sg.Column([
-            [sg.B((_('Adicionar')), k='-ADICIONAR-', bind_return_key=True)],
-            [sg.B((_('Atualizar')), k='-ATUALIZAR-', disabled=True)],
+            [sg.B((_('Adicionar')), s=sz, k='-ADICIONAR-', bind_return_key=True)],
+            [sg.B((_('Atualizar')), s=sz, k='-ATUALIZAR-', disabled=True)],
 
-            [sg.B((_('Cancelar')), k='-CANCELAR-', disabled=True)]
+            [sg.B((_('Cancelar')), s=sz, k='-CANCELAR-', disabled=True)]
         ])
         coluna2_def = sg.Column([
             [sg.Checkbox((_('É recorrente?')), k='-RECORRENTE-')],
@@ -613,13 +682,13 @@ class funcao_principal:
         # bloco_def = [[coluna1_def], [coluna2_def]
         #             ]
 
-        menu_def = [['&Arquivo', ['Adicionar aluno', 'Imprimir relatório', 'Informações do aluno', '---', '&Sair']],
-                    # 'Save::savekey',
-                    ['&Editar', ['!Configurações', 'Mudar tema'], ],
+        menu_def = [['&Arquivo', ['Adicionar movimento', 'Alterar movimento', 'Apagar movimento',
+                                  'Categorias', '---', '&Sair']],
+                    ['&Editar', ['Mudar tema'], ],
                     ['&Relatórios', ['Categorias anual', 'Recebido anual']],
                     ['Gráficos',['Mensal por categorias', 'Anual por categorias']],
                     ['Apagar registros',['Apaga por categoria']],
-                    ['&Ferramentas', ['Backup parcial', 'Backup completo', 'Administração', ['Limpar banco de dados']]],
+                    ['&Ferramentas', ['Backup']],
                     ['A&juda', ['Tela principal', 'Sobre...', 'Erro']], ]
 
         self.layout = [[sg.Menu(menu_def)],
@@ -643,15 +712,15 @@ class funcao_principal:
                                  expand_x=True,
                                  expand_y=True,
                                  num_rows=16)],
-                       [sg.B((_('Alterar registro')), k='-ALTERA-'), sg.B((_('Apagar registro')), k='-APAGA-'),
-                        sg.B((_('Gráfico do mês')), k='Mensal por categorias'),
+                       [sg.B((_('Alterar registro')), s=sz, k='-ALTERA-'), sg.B((_('Apagar registro')), k='-APAGA-'),
+                        sg.B((_('Gráfico do mês')), s=sz, k='Mensal por categorias'),
                         sg.Push(), sg.T((_('Saldo:'))),
                         sg.I(
                              size=10, k='-SALDO-')],
                        [sg.Frame((_('Movimento')), [[coluna1_def, coluna2_def, coluna3_def]],
                                  k='-FRAME-')],  # , background_color='#a4a3a1'
                        # s=(800, 100),
-                       [sg.Push(), sg.Button((_('Sair')), k='-SAIR-')]]
+                       [sg.Push(), sg.Button((_('Sair')), s=sz, k='-SAIR-')]]
 
         return sg.Window('Grana!', self.layout, enable_close_attempted_event=True,
                          location=sg.user_settings_get_entry('-posicao-', (None, None)),
@@ -674,6 +743,10 @@ class funcao_principal:
 
         while True:
             self.event, self.values = self.window.read()
+
+            if self.event == 'Backup':
+                obj_backup = Backup()
+                obj_backup.run()
 
             # teste do logger de erros
             if self.event == 'Erro':
@@ -771,7 +844,7 @@ class funcao_principal:
                     self.window = self.cria_janela()
                     self.window.write_event_value('-ATUALIZA-', '')
 
-            if self.event == '-ADICIONAR-':
+            if self.event in ('-ADICIONAR-', 'Adicionar movimento'):
                 ensai = ''
                 if self.values['-ENTRADA-']:
                     ensai = 'Entrada'
@@ -865,7 +938,7 @@ class funcao_principal:
                         # data = [data[0]] + new_table
             # SORT TABLE
 
-            if self.event == '-ALTERA-':
+            if self.event in ('-ALTERA-', 'Alterar movimento'):
                 if len(self.row) != 0:
                     self.window['-CANCELAR-'].update(disabled=False)
                     self.indice_tmp = self.dados[self.row[0]][0]
@@ -1010,7 +1083,7 @@ class funcao_principal:
                         break
                 self.win.close()
 
-            if self.event == '-CATEGORIAS-':
+            if self.event in ('-CATEGORIAS-', 'Categorias'):
                 self.win = self.janela_cat()
                 while True:
                     self.ev, self.val = self.win.read()
@@ -1059,7 +1132,7 @@ class funcao_principal:
                         break
                 self.win.close()
 
-            if self.event == '-APAGA-':
+            if self.event in ('-APAGA-', 'Apagar movimento'):
                 if len(self.row) != 0:
                     if self.dados[self.row[0]][6] != '':
                         # print('é recorrente!')
