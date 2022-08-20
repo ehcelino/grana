@@ -1,0 +1,9 @@
+Seja bem vindo ao sistema Grana! de controle financeiro.
+Antes de tudo, vamos explicar rapidinho como o sistema funciona:
+A base de tudo é o Lançamento, que significa uma movimentação de valores, como o pagamento de uma conta ou o recebimento de um salário.
+Lançamentos podem ser de dois tipos diferentes: Entrada (quando você recebe o dinheiro) e Saída (quando você paga por alguma coisa).
+Além disso, lançamentos são dividos entre normais (acontecem uma só vez) e Recorrentes (acontecem todo mês com o mesmo valor).
+Por exemplo, se você recebe seu salário mensalmente com o mesmo valor, pode lançá-lo como recorrente.
+Por fim, todo lançamento faz parte de uma Categoria. A categoria ajuda a criar conjuntos de lançamentos relacionados entre si.
+A primeira coisa que precisamos fazer é criar algumas categorias. Você pode adicionar outras categorias a hora que quiser.
+Você deseja iniciar o programa com algumas categorias padrão, ou criar suas próprias categorias?
