@@ -23,7 +23,7 @@ def mov_lista_cat_mensal(mesano):
                valor = valor + y[1]
         final.append([x, valor])
         valor = 0.0
-    print(final)
+    # print(final)
     return final
 
 def mov_lista_cat_anual(ano):
@@ -44,7 +44,7 @@ def mov_lista_cat_anual(ano):
                valor = valor + y[1]
         final.append([x, valor])
         valor = 0.0
-    print(final)
+    # print(final)
     return final
 
 def draw_figure(canvas, figure):

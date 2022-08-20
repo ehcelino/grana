@@ -43,10 +43,18 @@ logging.getLogger().addHandler(logging.StreamHandler())
 
 locale.setlocale(locale.LC_ALL, '')
 sg.user_settings_filename('grana.json','./')
+sg.theme(sg.user_settings_get_entry('-tema-', None))
+
 
 regexData = re.compile(r'\d{2}/\d{2}/\d{4}')
 regexDinheiro = re.compile(r'^(\d{1,}\,\d{2}?)$')
 regexDia = re.compile(r'\b[0-3]{0,1}[0-9]{1}\b')
+
+def abrir_texto(nomearquivo):
+    f = open(os.path.join(os.getcwd(), nomearquivo), encoding='utf-8')
+    texto = f.read()
+    f.close()
+    return texto
 
 def mesatual():
     res = ''
@@ -101,7 +109,7 @@ def cria_db():
         c.execute(
             'CREATE TABLE "recorrente" ("re_index" INTEGER, "re_dia" TEXT, '
             '"re_tipo" TEXT, "re_categoria" TEXT, "re_descricao" TEXT, '
-            '"re_valor" REAL, "re_data_inicio" TEXT, PRIMARY KEY("re_index"))'
+            '"re_valor" REAL, "re_data_inicio" TEXT, "re_ultima_atualizacao" TEXT, PRIMARY KEY("re_index"))'
         )
         conexao.commit()
     except Exception as err:
@@ -356,6 +364,42 @@ class splashscreen():
         sg.Window('Nada', [[sg.Image(data=img.logo_grande64)]], transparent_color=sg.theme_background_color(),
                   no_titlebar=True, keep_on_top=True).read(timeout=2000, close=True)
 
+class janela_inicial():
+    global _
+    def __init__(self):
+        self.layout = [
+            [sg.Text((_('Só um minutinho por favor...')))],
+            [sg.Multiline(abrir_texto('introducao.txt'), size=(70, 20), disabled=True)],
+            [sg.Text((_('Esta janela não será exibida novamente.')))],
+            [sg.Push(), sg.B((_('Criar categorias padrão')), k='-PADRAO-'),
+             sg.B((_('Seguir sem criar categorias')), k='-SEGUIR-'), sg.Push()]
+        ]
+        self.window = sg.Window('Bem vindo', self.layout,
+                                default_element_size=(12, 1), finalize=True, modal=True)
+
+    def run(self):
+        while True:
+            self.event, self.values = self.window.read()
+            print(self.event, self.values)
+            if self.event == '-PADRAO-':
+                categorias_criar('Gastos em geral')
+                categorias_criar('Supermercado')
+                categorias_criar('Salário')
+                categorias_criar('Alimentação')
+                categorias_criar('Contas')
+                categorias_criar('Recebimentos')
+                sg.popup('Categorias criadas','Pronto, foram criadas algumas categorias padrão.'
+                         ' Você pode apagar as que não precisar, ou adicionar mais categorias.')
+                break
+
+            if self.event == '-SEGUIR-':
+                sg.popup('Nenhuma categoria criada','Nenhuma categoria foi criada, portanto antes de'
+                         ' inserir um movimento você precisa criar algumas categorias manualmente.')
+                break
+
+            if self.event == sg.WIN_CLOSED:
+                break
+        self.window.close()
 
 class funcao_principal:
     global _
@@ -371,6 +415,7 @@ class funcao_principal:
     indice_tmp = None
     indice_recorrente = 0
     linha_tmp = []
+
     def janela_recorrente(self):
         layout = [
             [sg.Text((_('Você está prestes a apagar um lançamento recorrente.')))],
@@ -466,7 +511,7 @@ class funcao_principal:
 
     def cria_janela(self):
         global _
-        sg.theme(sg.user_settings_get_entry('-tema-', None))
+        # sg.theme(sg.user_settings_get_entry('-tema-', None))
         coluna1_def = sg.Column(
             [[sg.T(_('Data:')), sg.I(default_text=datetime.strftime(datetime.now(), '%d/%m/%Y'), k='-DATAMOV-',
                                   size=10),
@@ -492,7 +537,10 @@ class funcao_principal:
             [sg.Checkbox((_('É recorrente?')), k='-RECORRENTE-')],
             [sg.T((_('Dia do mês:'))), sg.I(size=3, k='-DIARECORRENTE-')],
             [sg.T((_('A partir de:'))),
-             sg.I(default_text=datetime.strftime(datetime.now(), '%d/%m/%Y'), k='-DATARECORRENTE-', size=10)]
+             sg.I(default_text=datetime.strftime(datetime.now(), '%d/%m/%Y'), k='-DATARECORRENTE-', size=10),
+             sg.CalendarButton((_('Data')), locale='pt_BR', format='%d/%m/%Y',
+                               month_names=meses, day_abbreviations=dias, no_titlebar=False, title='Data')
+             ]
         ])
 
         # bloco_def = [[coluna1_def], [coluna2_def]
@@ -982,6 +1030,8 @@ if firstrun:
     cria_db()
     sg.user_settings_set_entry('-anoinicial-', datetime.today().year)
     sg.user_settings_set_entry('-firstrun-', False)
+    obj_inicial = janela_inicial()
+    obj_inicial.run()
 
 try:
     movimento_integra()
