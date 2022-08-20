@@ -296,6 +296,17 @@ def movimento_apaga_recorrente(index):
     conexao.commit()
     conexao.close()
 
+def movimento_apaga_por_categoria(categoria):
+    conexao = sqlite3.connect(arqdb)
+    c = conexao.cursor()
+    comando = 'DELETE FROM movimento WHERE mo_categoria = ?'
+    c.execute(comando, (categoria,))
+    conexao.commit()
+    comando = 'DELETE FROM recorrente WHERE re_categoria = ?'
+    c.execute(comando, (categoria,))
+    conexao.commit()
+    conexao.close()
+
 def movimento_apaga_recorrente_retro(index):
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
@@ -319,6 +330,16 @@ def mov_anual_categoria(categoria, ano):
     ano2 = '%' + str(ano) + '%'
     c.execute(comando, (ano2, categoria, tipo))
     resultado = c.fetchall()
+    return resultado
+
+def mov_por_categoria(categoria):
+    conexao = sqlite3.connect(arqdb)
+    c = conexao.cursor()
+    comando = ('SELECT mo_index FROM movimento '
+               'WHERE mo_categoria = ?')
+    c.execute(comando, (categoria,))
+    tmp = c.fetchall()
+    resultado = len(tmp)
     return resultado
 
 def mov_anual_recebido(ano):
@@ -436,6 +457,24 @@ class funcao_principal:
     indice_recorrente = 0
     linha_tmp = []
 
+################################ Janela apaga movimentos por categoria
+    def janela_apaga_por_cat(self):
+        layout = [
+            [sg.Text((_('Apagar movimentos por categoria')), font='_ 25')],
+            [sg.HorizontalSeparator(k='-SEP-')],
+            [sg.T((_('Categoria: '))),
+             sg.Combo(categorias_ler(), k='-CATEGORIAS-', s=40, readonly=True, enable_events=True),],
+            [sg.T((_('Quantidade de registros que serão afetados:'))), sg.I(k='-QTDMOV-', s=(6, 1))],
+            [sg.T((_('Atenção: esta operação é irreversível. \n'
+                     'Os registros afetados serão excluídos permanentemente. A exclusão afetará todos os registros\n'
+                     'dentro da categoria, incluindo registros antigos.')))],
+            [sg.Push(), sg.B((_('Apagar todos os movimentos')), k='-APAGAR-'), sg.B('Voltar', k='-VOLTAR-')]
+        ]
+        return sg.Window((_('Apagar movimento por categoria')), layout,
+                         finalize=True)
+################################ Janela apaga movimentos por categoria
+
+################################ Janela apaga movimento recorrente
     def janela_recorrente(self):
         layout = [
             [sg.Text((_('Você está prestes a apagar um lançamento recorrente.')))],
@@ -446,7 +485,9 @@ class funcao_principal:
         ]
         return sg.Window((_('Apagar')), layout,
                          finalize=True)
+################################ Janela apaga movimento recorrente
 
+################################ Janela sobre
     def janela_sobre(self):
         layout = [
             [sg.Text((_('Sobre')), font='_ 25')],
@@ -461,7 +502,9 @@ class funcao_principal:
         ]
         return sg.Window((_('Sobre...')), layout,
                          finalize=True)
+################################ Janela sobre
 
+################################ Janela gerenciamento de categorias
     def janela_cat(self):
         layout = [
             [sg.Text((_('Categorias')), font='_ 25')],
@@ -474,8 +517,9 @@ class funcao_principal:
         ]
         return sg.Window((_('Categorias')), layout,
                          finalize=True)
+################################ Janela gerenciamento de categorias
 
-
+################################ Janela de relatório anual por categoria
     def janela_gasto_anual_cat(self):
         tbl_titulos = [(_('Data')), (_('Descrição')), (_('Valor'))]
         tbl_largura = [10, 30, 10]
@@ -502,7 +546,9 @@ class funcao_principal:
         ]
         return sg.Window((_('Gasto anual por categoria')), layout,
                          finalize=True)
+################################ Janela de relatório anual por categoria
 
+################################ Janela de relatório de valor recebido por ano
     def janela_recebido_anual(self):
         tbl_titulos = [(_('Data')), (_('Descrição')), (_('Valor'))]
         tbl_largura = [10, 30, 10]
@@ -527,8 +573,9 @@ class funcao_principal:
         ]
         return sg.Window((_('Valor recebido anual')), layout,
                          finalize=True)
+################################ Janela de relatório de valor recebido por ano
 
-
+################################ Janela principal do programa
     def cria_janela(self):
         global _
         # sg.theme(sg.user_settings_get_entry('-tema-', None))
@@ -571,6 +618,7 @@ class funcao_principal:
                     ['&Editar', ['!Configurações', 'Mudar tema'], ],
                     ['&Relatórios', ['Categorias anual', 'Recebido anual']],
                     ['Gráficos',['Mensal por categorias', 'Anual por categorias']],
+                    ['Apagar registros',['Apaga por categoria']],
                     ['&Ferramentas', ['Backup parcial', 'Backup completo', 'Administração', ['Limpar banco de dados']]],
                     ['A&juda', ['Tela principal', 'Sobre...', 'Erro']], ]
 
@@ -608,6 +656,7 @@ class funcao_principal:
         return sg.Window('Grana!', self.layout, enable_close_attempted_event=True,
                          location=sg.user_settings_get_entry('-posicao-', (None, None)),
                          finalize=True)
+################################ Janela principal do programa
 
     def __init__(self):
         self.window = self.cria_janela()
@@ -926,6 +975,40 @@ class funcao_principal:
                     self.window['-CATEGORIA-'].update(value='')
                     self.window['-DESCRICAO-'].update(value='')
                     self.window['-VALORMOV-'].update(value='')
+
+            if self.event == 'Apaga por categoria':
+                self.win = self.janela_apaga_por_cat()
+
+                while True:
+                    self.ev, self.val = self.win.read()
+
+                    if self.ev == '-CATEGORIAS-':
+                        temp = mov_por_categoria(self.val['-CATEGORIAS-'])
+                        print(temp)
+                        self.win['-QTDMOV-'].update(value=temp)
+
+                    if self.ev == '-APAGAR-':
+                        self.eve, self.valu = sg.Window('Continuar?', [[sg.T('Esta operação não pode ser desfeita.')],
+                                                            [sg.Yes(s=10, button_text='Sim'),
+                                                             sg.No(s=10, button_text='Não')]], disable_close=True,
+                                             modal=True).read(close=True)
+                        if self.eve == 'Sim':
+                            if self.val['-CATEGORIAS-'] != '':
+                                print('Categoria que será apagada: ', self.val['-CATEGORIAS-'])
+                                try:
+                                    movimento_apaga_por_categoria(self.val['-CATEGORIAS-'])
+                                    sg.popup('Exclusão realizada com sucesso.')
+                                except Exception as err:
+                                    logger.error(err, exc_info=True)
+                                    sg.popup((_('Ocorreu um erro durante a exclusão por categoria.')))
+
+                            else:
+                                sg.popup('Selecione uma categoria.')
+
+                    if self.ev in (sg.WINDOW_CLOSED, '-VOLTAR-'):
+                        self.window.write_event_value('-ATUALIZA-', '')
+                        break
+                self.win.close()
 
             if self.event == '-CATEGORIAS-':
                 self.win = self.janela_cat()
