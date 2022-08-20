@@ -428,7 +428,6 @@ class Backup:
     def run(self):
         while True:
             self.event, self.values = self.window.read()
-            print(self.event, self.values)
             if self.event in (sg.WIN_CLOSED, '-SAIR-'):
                 break
             if self.event == '-BACKUP-':
