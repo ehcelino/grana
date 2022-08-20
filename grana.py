@@ -559,7 +559,7 @@ class funcao_principal:
         layout = [
             [sg.Text((_('Sobre')), font='_ 25')],
             [sg.HorizontalSeparator(k='-SEP-')],
-            [sg.Text((_('A fazer...')))],
+            [sg.Multiline(abrir_texto('sobre.txt'), size=(70, 20), disabled=True)],
             [sg.Text((_('Quer personalizar sua cópia do programa? Digite seu nome abaixo:')))],
             [sg.I(s=(20, 1), k='-NOME-', default_text=sg.user_settings_get_entry('-usuario-', '')),
              sg.B((_('Gravar')), k='-GRAVA-')],
