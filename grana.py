@@ -83,7 +83,7 @@ def abrir_texto(nomearquivo):
 
 def mesatual():
     """
-    Esta função pode ser substituída.
+    Retorna o nome do mês atual por extenso capitalizado.
     :return: Mês atual por extenso capitalizado
     """
     mesatual = datetime.strftime(datetime.now(), '%B')
