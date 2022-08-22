@@ -86,34 +86,9 @@ def mesatual():
     Esta função pode ser substituída.
     :return: Mês atual por extenso capitalizado
     """
-    res = ''
-    mesat = datetime.now()
-    m = mesat.strftime('%m')
-    if m == '01':
-        res = meses[0]
-    elif m == '02':
-        res = meses[1]
-    elif m == '03':
-        res = meses[2]
-    elif m == '04':
-        res = meses[3]
-    elif m == '05':
-        res = meses[4]
-    elif m == '06':
-        res = meses[5]
-    elif m == '07':
-        res = meses[6]
-    elif m == '08':
-        res = meses[7]
-    elif m == '09':
-        res = meses[8]
-    elif m == '10':
-        res = meses[9]
-    elif m == '11':
-        res = meses[10]
-    elif m == '12':
-        res = meses[11]
-    return res
+    mesatual = datetime.strftime(datetime.now(), '%B')
+    mesatual = mesatual.capitalize()
+    return mesatual
 
 def cria_db():
     """
