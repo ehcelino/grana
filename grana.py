@@ -72,12 +72,20 @@ regexDinheiro = re.compile(r'^(\d{1,}\,\d{2}?)$')
 regexDia = re.compile(r'\b[0-3]{0,1}[0-9]{1}\b')
 
 def abrir_texto(nomearquivo):
+    """Retorna o texto de um arquivo.
+    :param nomearquivo: Nome do arquivo de texto
+    :return: Conteúdo do arquivo de texto
+    """
     f = open(os.path.join(os.getcwd(), nomearquivo), encoding='utf-8')
     texto = f.read()
     f.close()
     return texto
 
 def mesatual():
+    """
+    Esta função pode ser substituída.
+    :return: Mês atual por extenso capitalizado
+    """
     res = ''
     mesat = datetime.now()
     m = mesat.strftime('%m')
@@ -108,6 +116,10 @@ def mesatual():
     return res
 
 def cria_db():
+    """
+    Cria o banco de dados e as tabelas.
+    :return: None
+    """
     try:
         os.makedirs(caminho, exist_ok=True)
     except Exception as err:
@@ -139,7 +151,11 @@ def cria_db():
     conexao.close()
 
 def movimento_calcula_total(mesano):
-    # retorna o valor total do movimento do mês
+    """
+    Calcula o valor total do movimento de um mês
+    :param mesano: 'mês/ano' formato %m/%Y
+    :return: Valor total do movimento (float)
+    """
     mesano = '%' + mesano + '%'
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
@@ -154,6 +170,11 @@ def movimento_calcula_total(mesano):
     return valor
 
 def movimento_ler_indice(indice):
+    """
+    Lê o banco de dados e retorna valores de acordo com o índice.
+    :param indice: (int) índice da tabela
+    :return: data (str), tipo (str), categoria (str), descrição (str), valor (str), recorrente (int)
+    """
     # retorna data, tipo, categoria, descrição, valor, recorrente
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
@@ -167,7 +188,12 @@ def movimento_ler_indice(indice):
 
 
 def movimento_ler(mesano):
-    # retorna indice, data, tipo, categoria, descrição, valor, R para recorrente e índice do recorrente
+    """
+    Lê os movimentos de um mês.
+    :param mesano: 'mês/ano' formato %m/%Y
+    :return: indice (int), data (str), tipo (str), categoria (str),
+    descrição (str) valor (str), recorrente (str), indice de recorrencia (int)
+    """
     mesano = '%' + mesano + '%'
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
@@ -188,7 +214,11 @@ def movimento_ler(mesano):
     return resultado_final
 
 def movimento_ler_recorrente(indice):
-    # retorna dia e data de início
+    """
+    Lê um movimento recorrente a partir de um índice
+    :param indice: índice do movimento (int)
+    :return: dia (str), data de início da recorrência (str)
+    """
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
     c.execute('SELECT re_dia, re_data_inicio FROM recorrente WHERE re_index = ?', (indice,))
@@ -197,6 +227,16 @@ def movimento_ler_recorrente(indice):
 
 
 def movimento_grava(data, tipo, categoria, descricao, valor, relrec):
+    """
+    Grava um movimento na tabela movimentos.
+    :param data: data do movimento (str)
+    :param tipo: tipo de movimento (str)
+    :param categoria: categoria do movimento (str)
+    :param descricao: descrição do movimento (str)
+    :param valor: valor do movimento (float)
+    :param relrec: se o movimento tem relação com um mov. recorrente, o índice do recorrente (int)
+    :return: None
+    """
     dados = [data, tipo, categoria, descricao, valor, relrec]
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
@@ -207,6 +247,16 @@ def movimento_grava(data, tipo, categoria, descricao, valor, relrec):
     conexao.close()
 
 def movimento_grava_recorrente(dia, tipo, categoria, descricao, valor, datainicio):
+    """
+    Grava um mov. recorrente na tabela recorrente e também na tabela movimento de acordo com a data de início
+    :param dia: dia da recorrência no mês (str)
+    :param tipo: tipo (str)
+    :param categoria: categoria (str)
+    :param descricao: descrição (str)
+    :param valor: valor (float)
+    :param datainicio: data que começa a recorrência (str)
+    :return: None
+    """
     dataultimaatualizacao = str(dia) + datetime.strftime(datetime.now(), '/%m/%Y')
     dados = [dia, tipo, categoria, descricao, valor, datainicio, dataultimaatualizacao]
     conexao = sqlite3.connect(arqdb)
@@ -229,6 +279,10 @@ def movimento_grava_recorrente(dia, tipo, categoria, descricao, valor, datainici
     conexao.close()
 
 def movimento_integra():
+    """
+    Integra os movimentos recorrentes com os movimentos comuns de acordo com a data
+    :return: None
+    """
     # ultima_ativacao = sg.user_settings_get_entry('-ultimaativacao-')
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
@@ -257,6 +311,16 @@ def movimento_integra():
     # print(resultado)
 
 def movimento_atualiza(indice, data, tipo, categoria, descricao, valor):
+    """
+    Atualiza um movimento normal na tabela movimentos
+    :param indice: Índice do movimento a ser atualizado (int)
+    :param data: Data (str)
+    :param tipo: Tipo (str)
+    :param categoria: Cat. (str)
+    :param descricao: Desc. (str)
+    :param valor: Valor (float)
+    :return: None
+    """
     dados = [data, tipo, categoria, descricao, valor, indice]
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
@@ -268,6 +332,17 @@ def movimento_atualiza(indice, data, tipo, categoria, descricao, valor):
 
 
 def movimento_atualiza_recorrente(indice, dia, tipo, categoria, descricao, valor, data_inicio):
+    """
+    Atualiza um movimento recorrente na tabela recorrentes
+    :param indice: Índice (int)
+    :param dia: Dia (str)
+    :param tipo: Tipo (str)
+    :param categoria: Cat. (str)
+    :param descricao: Desc. (str)
+    :param valor: Valor (float)
+    :param data_inicio: Data do início da recorrência (str)
+    :return: None
+    """
     dados = [dia, tipo, categoria, descricao, valor, data_inicio, indice]
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
@@ -278,6 +353,11 @@ def movimento_atualiza_recorrente(indice, dia, tipo, categoria, descricao, valor
     conexao.close()
 
 def movimento_apaga(index):
+    """
+    Apaga um movimento comum
+    :param index: Índice (int)
+    :return: None
+    """
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
     comando = 'DELETE FROM movimento WHERE mo_index = ?'
@@ -286,6 +366,11 @@ def movimento_apaga(index):
     conexao.close()
 
 def movimento_apaga_recorrente(index):
+    """
+    Apaga um movimento recorrente
+    :param index: Índice (int)
+    :return: None
+    """
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
     comando = 'DELETE FROM recorrente WHERE re_index = ?'
@@ -298,6 +383,11 @@ def movimento_apaga_recorrente(index):
     conexao.close()
 
 def movimento_apaga_por_categoria(categoria):
+    """
+    Apaga movimentos (comuns e recorrentes) de acordo com uma categoria.
+    :param categoria: Cat. do movimento (str)
+    :return: None
+    """
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
     comando = 'DELETE FROM movimento WHERE mo_categoria = ?'
@@ -309,6 +399,11 @@ def movimento_apaga_por_categoria(categoria):
     conexao.close()
 
 def movimento_apaga_recorrente_retro(index):
+    """
+    Apaga um movimento recorrente e os movimentos comuns retroativamente.
+    :param index: Índice (int)
+    :return: None
+    """
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
     comando = 'DELETE FROM recorrente WHERE re_index = ?'
@@ -321,7 +416,12 @@ def movimento_apaga_recorrente_retro(index):
     conexao.close()
 
 def mov_anual_categoria(categoria, ano):
-    # retorna data da operação, descrição , valor
+    """
+    Retorna os movimentos de saída agrupados em uma categoria de um determinado ano
+    :param categoria: Cat. do movimento (str)
+    :param ano: Ano desejado (str)
+    :return: data do mov. (str), descrição (str), valor (float)
+    """
     tipo = 'Saída'
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
@@ -334,6 +434,11 @@ def mov_anual_categoria(categoria, ano):
     return resultado
 
 def mov_por_categoria(categoria):
+    """
+    Retorna a quantidade de movimentos em uma determinada categoria
+    :param categoria: Categoria (str)
+    :return: Quantidade de movimentos (int)
+    """
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
     comando = ('SELECT mo_index FROM movimento '
@@ -344,7 +449,11 @@ def mov_por_categoria(categoria):
     return resultado
 
 def mov_anual_recebido(ano):
-    # retorna data da operação, descrição , valor
+    """
+    Retorna a data, descrição e valor dos movimentos de entrada em um determinado ano.
+    :param ano: ano (int, str)
+    :return: data do movimento (str), descrição (str), valor (float)
+    """
     tipo = 'Entrada'
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
@@ -356,6 +465,10 @@ def mov_anual_recebido(ano):
     return resultado
 
 def categorias_ler():
+    """
+    Retorna os nomes de todas as categorias.
+    :return: categorias (list[str])
+    """
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
     c.execute('SELECT ca_categoria FROM categoria')
@@ -367,6 +480,11 @@ def categorias_ler():
     return resultado_list
 
 def categorias_apaga(categoria):
+    """
+    Apaga uma categoria, tornando os movimentos que lhe pertenciam órfãos.
+    :param categoria: categoria (str)
+    :return: None
+    """
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
     dados = ['Sem categoria', categoria]
@@ -379,6 +497,11 @@ def categorias_apaga(categoria):
     conexao.close()
 
 def categorias_criar(categoria):
+    """
+    Cria uma categoria.
+    :param categoria: nome da categoria (str)
+    :return: None
+    """
     conexao = sqlite3.connect(arqdb)
     c = conexao.cursor()
     c.execute('INSERT INTO categoria(ca_categoria) VALUES (?)', (categoria,))
